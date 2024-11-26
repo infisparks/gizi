@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>IGZINET Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Admin Dashboard for IGZINET" name="description">
+    <meta content="Admin, Dashboard, IGZINET" name="keywords">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <!-- Your Firebase Configuration -->
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCjDN2loFBsVmZr3pQJGmVi1ZR3SWpeo4k",
+            authDomain: "igzi-418a7.firebaseapp.com",
+            databaseURL: "https://igzi-418a7-default-rtdb.firebaseio.com",
+            projectId: "igzi-418a7",
+            storageBucket: "igzi-418a7.appspot.com",
+            messagingSenderId: "428960456482",
+            appId: "1:428960456482:web:11690cac87a7a09320cf7b",
+            measurementId: "G-8LGMW1FGS6"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Admin Header -->
+    <header class="bg-blue-600 text-white p-4 shadow">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">IGZINET Admin Dashboard</h1>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
+        </div>
+    </header>
+
+    <!-- Admin Content -->
+    <main class="container mx-auto p-4">
+        <!-- Login Redirect -->
+        <div id="loginRedirect" class="text-center mt-10 hidden">
+            <h2 class="text-xl font-bold mb-4">You are not logged in.</h2>
+            <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Go to Login</a>
+        </div>
+
+        <!-- Contacts Table -->
+        <div id="adminContent" class="hidden mt-10">
+            <h2 class="text-xl font-bold mb-6">Contact Form Submissions</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded shadow">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Name</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Email</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Package</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Phone</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Address</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Message</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Timestamp</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contactsTableBody">
+                        <!-- Data will be populated here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success/Error Modal -->
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded shadow-lg w-80">
+            <p id="modalMessage" class="mb-4"></p>
+            <button id="closeModal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
+        </div>
+    </div>
+
+    <!-- JavaScript for Admin Functionality -->
+    <script>
+        // Authentication State Observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                document.getElementById('adminContent').classList.remove('hidden');
+                document.getElementById('loginRedirect').classList.add('hidden');
+                loadContacts();
+            } else {
+                // User is signed out
+                document.getElementById('adminContent').classList.add('hidden');
+                document.getElementById('loginRedirect').classList.remove('hidden');
+            }
+        });
+
+        // Handle Logout
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            auth.signOut()
+                .then(() => {
+                    // Redirect to login page or show logged out state
+                    window.location.href = 'login.html';
+                })
+                .catch((error) => {
+                    showModal('Error logging out: ' + error.message, 'error');
+                });
+        });
+
+        // Reference to contacts in Firebase
+        const contactsRef = database.ref('contacts');
+
+        // Fetch and display contacts
+        function loadContacts() {
+            contactsRef.on('value', (snapshot) => {
+                const contactsTableBody = document.getElementById('contactsTableBody');
+                contactsTableBody.innerHTML = ''; // Clear existing data
+
+                snapshot.forEach((childSnapshot) => {
+                    const contact = childSnapshot.val();
+                    const contactKey = childSnapshot.key;
+
+                    // Format timestamp
+                    const date = new Date(contact.timestamp);
+                    const formattedDate = date.toLocaleString();
+
+                    // Create table row
+                    const tr = document.createElement('tr');
+                    tr.classList.add('border-b');
+
+                    tr.innerHTML = `
+                        <td class="py-2 px-4">${escapeHTML(contact.name)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.email)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.package)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.phone)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.address)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.message)}</td>
+                        <td class="py-2 px-4">${formattedDate}</td>
+                        <td class="py-2 px-4 text-center">
+                            <button class="delete-btn text-red-600 hover:text-red-800" data-key="${contactKey}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    contactsTableBody.appendChild(tr);
+                });
+            });
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        // Handle Delete Action
+        document.getElementById('contactsTableBody').addEventListener('click', function (e) {
+            if (e.target.closest('.delete-btn')) {
+                const key = e.target.closest('.delete-btn').getAttribute('data-key');
+                if (confirm('Are you sure you want to delete this entry?')) {
+                    database.ref('contacts/' + key).remove()
+                        .then(() => {
+                            showModal('Entry deleted successfully!', 'success');
+                        })
+                        .catch((error) => {
+                            showModal('Error deleting entry: ' + error.message, 'error');
+                        });
+                }
+            }
+        });
+
+        // Modal Functionality
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        function showModal(message, type) {
+            modalMessage.textContent = message;
+            if (type === 'success') {
+                modalMessage.classList.add('text-green-600');
+                modalMessage.classList.remove('text-red-600');
+            } else {
+                modalMessage.classList.add('text-red-600');
+                modalMessage.classList.remove('text-green-600');
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        closeModalBtn.addEventListener('click', function () {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+
+        // Hide Spinner after loading
+        window.addEventListener('load', () => {
+            document.getElementById('spinner').classList.add('hidden');
+        });
+    </script>
+</body>
+
+</html>
