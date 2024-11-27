@@ -87,7 +87,7 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     // Redirect to admin dashboard upon successful login
-                    window.location.href = 'admin.html';
+                    window.location.href = 'index.html';
                 })
                 .catch((error) => {
                     displayLoginMessage(error.message, 'error');
