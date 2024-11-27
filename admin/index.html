@@ -2,15 +2,20 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>IGZINET Admin Panel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>IGZINET Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Admin Dashboard for IGZINET" name="description">
+    <meta content="Admin, Dashboard, IGZINET" name="keywords">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
 
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
-    <!-- Font Awesome CDN -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -31,379 +36,242 @@
             measurementId: "G-8LGMW1FGS6"
         };
 
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
     </script>
 
+    <!-- Custom Styles -->
     <style>
-        /* Custom scrollbar for modal */
-        .modal-content {
-            max-height: 90vh;
-            overflow-y: auto;
+        body {
+            font-family: 'Nunito', sans-serif;
         }
     </style>
 </head>
 
 <body class="bg-gray-100">
-    <!-- Header -->
-    <header class="bg-white shadow">
-        <div class="container mx-auto px-4 py-6">
-            <h1 class="text-3xl font-bold text-gray-800">IGZINET Admin Panel</h1>
+    <!-- Admin Header -->
+    <header class="bg-blue-600 text-white p-4 shadow">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">IGZINET Admin Dashboard</h1>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-6">
-        <!-- Add Package Form -->
-        <section class="bg-white p-6 rounded-lg shadow-lg mb-6">
-            <h2 class="text-2xl font-semibold mb-4">Add New Package</h2>
-            <form id="add-package-form" class="space-y-4">
-                <div>
-                    <label for="package-speed" class="block text-gray-700">Speed</label>
-                    <input type="text" id="package-speed" class="w-full mt-1 p-2 border rounded-md" placeholder="e.g., 30 Mbps" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700">Durations and Prices</label>
-                    <div id="durations-container" class="space-y-2">
-                        <div class="flex space-x-2">
-                            <input type="number" min="1" placeholder="Days" class="durations-days w-1/2 p-2 border rounded-md" required>
-                            <input type="number" min="1" placeholder="Price (Rs)" class="durations-price w-1/2 p-2 border rounded-md" required>
-                            <button type="button" class="add-duration-btn bg-green-500 text-white px-2 rounded-md"><i class="fa fa-plus"></i></button>
+    <!-- Admin Content -->
+    <main class="container mx-auto p-4">
+        <!-- Login Redirect -->
+        <div id="loginRedirect" class="text-center mt-10 hidden">
+            <h2 class="text-xl font-bold mb-4">You are not logged in.</h2>
+            <a href="login.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Go to Login</a>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminContent" class="hidden mt-10">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <!-- Total Packages Card -->
+                <div class="bg-white p-6 rounded shadow">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-box fa-2x text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-xl font-bold" id="totalPackages">0</h2>
+                            <p class="text-gray-600">Total Packages</p>
                         </div>
                     </div>
+                    <a href="packages.html" class="block mt-4 text-blue-600 hover:underline">View Packages</a>
                 </div>
-                <div>
-                    <label for="installation-charge" class="block text-gray-700">Installation Charge (Rs)</label>
-                    <input type="number" id="installation-charge" class="w-full mt-1 p-2 border rounded-md" required>
+                <!-- Total Inquiries Card -->
+                <div class="bg-white p-6 rounded shadow">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-envelope fa-2x text-green-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-xl font-bold" id="totalInquiries">0</h2>
+                            <p class="text-gray-600">Total Inquiries</p>
+                        </div>
+                    </div>
+                    <a href="inquiries.html" class="block mt-4 text-green-600 hover:underline">View Inquiries</a>
                 </div>
-                <div>
-                    <label for="gpon-charge" class="block text-gray-700">GPON Box Charge (Rs)</label>
-                    <input type="number" id="gpon-charge" class="w-full mt-1 p-2 border rounded-md" required>
-                </div>
-                <div class="flex justify-end">
-                    <button type="submit"
-                        class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Add Package</button>
-                </div>
-            </form>
-        </section>
+                <!-- Add more cards as needed -->
+            </div>
 
-        <!-- Packages List -->
-        <section class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold mb-4">Package List</h2>
+            <!-- Contacts Table -->
+            <h2 class="text-xl font-bold mb-6">Contact Form Submissions</h2>
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-white">
+                <table class="min-w-full bg-white rounded shadow">
                     <thead>
                         <tr>
-                            <th class="py-2 px-4 border-b">Speed</th>
-                            <th class="py-2 px-4 border-b">Durations & Prices</th>
-                            <th class="py-2 px-4 border-b">Installation Charge (Rs)</th>
-                            <th class="py-2 px-4 border-b">GPON Box Charge (Rs)</th>
-                            <th class="py-2 px-4 border-b">Actions</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Name</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Email</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Package</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Phone</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Address</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Message</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Timestamp</th>
+                            <th class="py-2 px-4 bg-blue-600 text-white">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="packages-table-body">
-                        <!-- Packages will be loaded here dynamically -->
+                    <tbody id="contactsTableBody">
+                        <!-- Data will be populated here dynamically -->
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
     </main>
 
-    <!-- Edit Package Modal -->
-    <div id="edit-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2 p-6">
-            <h2 class="text-2xl font-semibold mb-4">Edit Package</h2>
-            <form id="edit-package-form" class="space-y-4">
-                <div>
-                    <label for="edit-package-speed" class="block text-gray-700">Speed</label>
-                    <input type="text" id="edit-package-speed" class="w-full mt-1 p-2 border rounded-md" required>
-                </div>
-                <div>
-                    <label class="block text-gray-700">Durations and Prices</label>
-                    <div id="edit-durations-container" class="space-y-2">
-                        <div class="flex space-x-2">
-                            <input type="number" min="1" placeholder="Days" class="edit-durations-days w-1/2 p-2 border rounded-md" required>
-                            <input type="number" min="1" placeholder="Price (Rs)" class="edit-durations-price w-1/2 p-2 border rounded-md" required>
-                            <button type="button" class="add-edit-duration-btn bg-green-500 text-white px-2 rounded-md"><i class="fa fa-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <label for="edit-installation-charge" class="block text-gray-700">Installation Charge (Rs)</label>
-                    <input type="number" id="edit-installation-charge" class="w-full mt-1 p-2 border rounded-md" required>
-                </div>
-                <div>
-                    <label for="edit-gpon-charge" class="block text-gray-700">GPON Box Charge (Rs)</label>
-                    <input type="number" id="edit-gpon-charge" class="w-full mt-1 p-2 border rounded-md" required>
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="close-edit-modal"
-                        class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">Cancel</button>
-                    <button type="submit"
-                        class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Save Changes</button>
-                </div>
-            </form>
+    <!-- Success/Error Modal -->
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded shadow-lg w-80">
+            <p id="modalMessage" class="mb-4"></p>
+            <button id="closeModal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
         </div>
     </div>
 
-    <!-- JavaScript -->
+    <!-- JavaScript for Admin Functionality -->
     <script>
-        // Reference to the packages in Firebase Database
-        const packagesRef = firebase.database().ref('packages');
+        // Authentication State Observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                document.getElementById('adminContent').classList.remove('hidden');
+                document.getElementById('loginRedirect').classList.add('hidden');
+                loadDashboardData();
+                loadContacts();
+            } else {
+                // User is signed out
+                document.getElementById('adminContent').classList.add('hidden');
+                document.getElementById('loginRedirect').classList.remove('hidden');
+            }
+        });
 
-        // Function to dynamically add duration fields
-        function addDuration(containerId, isEdit = false) {
-            const container = document.getElementById(containerId);
-            const durationDiv = document.createElement('div');
-            durationDiv.className = 'flex space-x-2';
-            durationDiv.innerHTML = `
-                <input type="number" min="1" placeholder="Days" class="${isEdit ? 'edit-durations-days' : 'durations-days'} w-1/2 p-2 border rounded-md" required>
-                <input type="number" min="1" placeholder="Price (Rs)" class="${isEdit ? 'edit-durations-price' : 'durations-price'} w-1/2 p-2 border rounded-md" required>
-                <button type="button" class="${isEdit ? 'remove-edit-duration-btn bg-red-500 text-white px-2 rounded-md' : 'remove-duration-btn bg-red-500 text-white px-2 rounded-md'}"><i class="fa fa-minus"></i></button>
-            `;
-            container.appendChild(durationDiv);
+        // Handle Logout
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            auth.signOut()
+                .then(() => {
+                    // Redirect to login page or show logged out state
+                    window.location.href = 'login.html';
+                })
+                .catch((error) => {
+                    showModal('Error logging out: ' + error.message, 'error');
+                });
+        });
 
-            // Add event listener to remove button
-            const removeBtn = durationDiv.querySelector('button');
-            removeBtn.addEventListener('click', () => {
-                container.removeChild(durationDiv);
+        // Reference to contacts and packages in Firebase
+        const contactsRef = database.ref('contacts');
+        const packagesRef = database.ref('packages');
+
+        // Load Dashboard Data
+        function loadDashboardData() {
+            // Load total inquiries
+            contactsRef.on('value', (snapshot) => {
+                const totalInquiries = snapshot.numChildren();
+                document.getElementById('totalInquiries').textContent = totalInquiries;
+            });
+
+            // Load total packages
+            packagesRef.on('value', (snapshot) => {
+                const totalPackages = snapshot.numChildren();
+                document.getElementById('totalPackages').textContent = totalPackages;
             });
         }
 
-        // Event listener for adding durations in Add Package Form
-        document.querySelector('.add-duration-btn').addEventListener('click', () => {
-            addDuration('durations-container');
-        });
-
-        // Event delegation for removing durations in Add Package Form
-        document.getElementById('durations-container').addEventListener('click', function (e) {
-            if (e.target.closest('.remove-duration-btn')) {
-                const durationDiv = e.target.closest('.flex');
-                durationDiv.parentNode.removeChild(durationDiv);
-            }
-        });
-
-        // Event listener for adding durations in Edit Package Form
-        document.querySelector('.add-edit-duration-btn')?.addEventListener('click', () => {
-            addDuration('edit-durations-container', true);
-        });
-
-        // Event delegation for removing durations in Edit Package Form
-        document.getElementById('edit-durations-container')?.addEventListener('click', function (e) {
-            if (e.target.closest('.remove-edit-duration-btn')) {
-                const durationDiv = e.target.closest('.flex');
-                durationDiv.parentNode.removeChild(durationDiv);
-            }
-        });
-
-        // Add Package Function
-        document.getElementById('add-package-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const speed = document.getElementById('package-speed').value.trim();
-            const installationCharge = document.getElementById('installation-charge').value.trim();
-            const gponCharge = document.getElementById('gpon-charge').value.trim();
-
-            const durationDays = document.querySelectorAll('.durations-days');
-            const durationPrices = document.querySelectorAll('.durations-price');
-
-            let durations = {};
-
-            durationDays.forEach((dayInput, index) => {
-                const days = dayInput.value.trim();
-                const price = durationPrices[index].value.trim();
-                if (days && price) {
-                    durations[days] = parseInt(price);
-                }
-            });
-
-            if (speed && installationCharge && gponCharge && Object.keys(durations).length > 0) {
-                const newPackageRef = packagesRef.push();
-                newPackageRef.set({
-                    speed,
-                    durations,
-                    installationCharge: parseInt(installationCharge),
-                    gponCharge: parseInt(gponCharge)
-                }).then(() => {
-                    // Clear the form
-                    document.getElementById('add-package-form').reset();
-                    document.getElementById('durations-container').innerHTML = `
-                        <div class="flex space-x-2">
-                            <input type="number" min="1" placeholder="Days" class="durations-days w-1/2 p-2 border rounded-md" required>
-                            <input type="number" min="1" placeholder="Price (Rs)" class="durations-price w-1/2 p-2 border rounded-md" required>
-                            <button type="button" class="add-duration-btn bg-green-500 text-white px-2 rounded-md"><i class="fa fa-plus"></i></button>
-                        </div>
-                    `;
-                    alert('Package added successfully!');
-                }).catch((error) => {
-                    console.error("Error adding package: ", error);
-                    alert('Failed to add package. Please try again.');
-                });
-            } else {
-                alert('Please fill in all fields and add at least one duration.');
-            }
-        });
-
-        // Load Packages Function
-        function loadPackages() {
-            packagesRef.on('value', (snapshot) => {
-                const packagesTableBody = document.getElementById('packages-table-body');
-                packagesTableBody.innerHTML = ''; // Clear existing rows
+        // Fetch and display contacts
+        function loadContacts() {
+            contactsRef.on('value', (snapshot) => {
+                const contactsTableBody = document.getElementById('contactsTableBody');
+                contactsTableBody.innerHTML = ''; // Clear existing data
 
                 snapshot.forEach((childSnapshot) => {
-                    const packageData = childSnapshot.val();
-                    const packageKey = childSnapshot.key;
+                    const contact = childSnapshot.val();
+                    const contactKey = childSnapshot.key;
 
-                    // Generate durations list
-                    let durationsList = '<ul>';
-                    for (const [days, price] of Object.entries(packageData.durations)) {
-                        durationsList += `<li>${days} Days: Rs ${price}</li>`;
-                    }
-                    durationsList += '</ul>';
+                    // Format timestamp
+                    const date = new Date(contact.timestamp);
+                    const formattedDate = date.toLocaleString();
 
                     // Create table row
-                    const row = document.createElement('tr');
+                    const tr = document.createElement('tr');
+                    tr.classList.add('border-b');
 
-                    row.innerHTML = `
-                        <td class="py-2 px-4 border-b">${packageData.speed}</td>
-                        <td class="py-2 px-4 border-b">${durationsList}</td>
-                        <td class="py-2 px-4 border-b">Rs ${packageData.installationCharge}</td>
-                        <td class="py-2 px-4 border-b">Rs ${packageData.gponCharge}</td>
-                        <td class="py-2 px-4 border-b">
-                            <button class="text-yellow-500 hover:text-yellow-700 mr-2" onclick="openEditModal('${packageKey}')">
-                                <i class="fa fa-edit"></i>
-                            </button>
-                            <button class="text-red-500 hover:text-red-700" onclick="deletePackage('${packageKey}')">
-                                <i class="fa fa-trash"></i>
+                    tr.innerHTML = `
+                        <td class="py-2 px-4">${escapeHTML(contact.name)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.email)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.package)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.phone)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.address)}</td>
+                        <td class="py-2 px-4">${escapeHTML(contact.message)}</td>
+                        <td class="py-2 px-4">${formattedDate}</td>
+                        <td class="py-2 px-4 text-center">
+                            <button class="delete-btn text-red-600 hover:text-red-800" data-key="${contactKey}">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     `;
 
-                    packagesTableBody.appendChild(row);
+                    contactsTableBody.appendChild(tr);
                 });
             });
         }
 
-        // Delete Package Function
-        function deletePackage(packageKey) {
-            if (confirm('Are you sure you want to delete this package?')) {
-                packagesRef.child(packageKey).remove()
-                    .then(() => {
-                        alert('Package deleted successfully!');
-                    })
-                    .catch((error) => {
-                        console.error("Error deleting package: ", error);
-                        alert('Failed to delete package. Please try again.');
-                    });
-            }
+        // Escape HTML to prevent XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        // Edit Package Functionality
-        let currentEditKey = null;
-
-        function openEditModal(packageKey) {
-            currentEditKey = packageKey;
-            const editModal = document.getElementById('edit-modal');
-
-            // Fetch package data
-            packagesRef.child(packageKey).once('value').then((snapshot) => {
-                const packageData = snapshot.val();
-
-                // Populate the form
-                document.getElementById('edit-package-speed').value = packageData.speed;
-                document.getElementById('edit-installation-charge').value = packageData.installationCharge;
-                document.getElementById('edit-gpon-charge').value = packageData.gponCharge;
-
-                // Populate durations
-                const editDurationsContainer = document.getElementById('edit-durations-container');
-                editDurationsContainer.innerHTML = ''; // Clear existing durations
-                for (const [days, price] of Object.entries(packageData.durations)) {
-                    const durationDiv = document.createElement('div');
-                    durationDiv.className = 'flex space-x-2';
-                    durationDiv.innerHTML = `
-                        <input type="number" min="1" placeholder="Days" class="edit-durations-days w-1/2 p-2 border rounded-md" value="${days}" required>
-                        <input type="number" min="1" placeholder="Price (Rs)" class="edit-durations-price w-1/2 p-2 border rounded-md" value="${price}" required>
-                        <button type="button" class="remove-edit-duration-btn bg-red-500 text-white px-2 rounded-md"><i class="fa fa-minus"></i></button>
-                    `;
-                    editDurationsContainer.appendChild(durationDiv);
+        // Handle Delete Action
+        document.getElementById('contactsTableBody').addEventListener('click', function (e) {
+            if (e.target.closest('.delete-btn')) {
+                const key = e.target.closest('.delete-btn').getAttribute('data-key');
+                if (confirm('Are you sure you want to delete this entry?')) {
+                    database.ref('contacts/' + key).remove()
+                        .then(() => {
+                            showModal('Entry deleted successfully!', 'success');
+                        })
+                        .catch((error) => {
+                            showModal('Error deleting entry: ' + error.message, 'error');
+                        });
                 }
-
-                // Show the modal
-                editModal.classList.remove('hidden');
-            }).catch((error) => {
-                console.error("Error fetching package data: ", error);
-                alert('Failed to fetch package data. Please try again.');
-            });
-        }
-
-        // Close Edit Modal
-        document.getElementById('close-edit-modal').addEventListener('click', function () {
-            document.getElementById('edit-modal').classList.add('hidden');
-            currentEditKey = null;
-            document.getElementById('edit-package-form').reset();
-        });
-
-        // Event delegation for adding durations in Edit Package Form
-        document.querySelector('#edit-modal .add-edit-duration-btn')?.addEventListener('click', () => {
-            addDuration('edit-durations-container', true);
-        });
-
-        // Event delegation for removing durations in Edit Package Form
-        document.getElementById('edit-durations-container')?.addEventListener('click', function (e) {
-            if (e.target.closest('.remove-edit-duration-btn')) {
-                const durationDiv = e.target.closest('.flex');
-                durationDiv.parentNode.removeChild(durationDiv);
             }
         });
 
-        // Update Package Function
-        document.getElementById('edit-package-form').addEventListener('submit', function (e) {
-            e.preventDefault();
+        // Modal Functionality
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalBtn = document.getElementById('closeModal');
 
-            if (!currentEditKey) {
-                alert('No package selected for editing.');
-                return;
-            }
-
-            const speed = document.getElementById('edit-package-speed').value.trim();
-            const installationCharge = document.getElementById('edit-installation-charge').value.trim();
-            const gponCharge = document.getElementById('edit-gpon-charge').value.trim();
-
-            const editDurationDays = document.querySelectorAll('.edit-durations-days');
-            const editDurationPrices = document.querySelectorAll('.edit-durations-price');
-
-            let durations = {};
-
-            editDurationDays.forEach((dayInput, index) => {
-                const days = dayInput.value.trim();
-                const price = editDurationPrices[index].value.trim();
-                if (days && price) {
-                    durations[days] = parseInt(price);
-                }
-            });
-
-            if (speed && installationCharge && gponCharge && Object.keys(durations).length > 0) {
-                packagesRef.child(currentEditKey).set({
-                    speed,
-                    durations,
-                    installationCharge: parseInt(installationCharge),
-                    gponCharge: parseInt(gponCharge)
-                }).then(() => {
-                    alert('Package updated successfully!');
-                    // Close the modal
-                    document.getElementById('edit-modal').classList.add('hidden');
-                    currentEditKey = null;
-                }).catch((error) => {
-                    console.error("Error updating package: ", error);
-                    alert('Failed to update package. Please try again.');
-                });
+        function showModal(message, type) {
+            modalMessage.textContent = message;
+            if (type === 'success') {
+                modalMessage.classList.add('text-green-600');
+                modalMessage.classList.remove('text-red-600');
             } else {
-                alert('Please fill in all fields and add at least one duration.');
+                modalMessage.classList.add('text-red-600');
+                modalMessage.classList.remove('text-green-600');
             }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        closeModalBtn.addEventListener('click', function () {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         });
 
-        // Initial Load
-        document.addEventListener('DOMContentLoaded', loadPackages);
+        // Hide Spinner after loading (if you have a spinner)
+        window.addEventListener('load', () => {
+            // document.getElementById('spinner').classList.add('hidden');
+        });
     </script>
 </body>
 
