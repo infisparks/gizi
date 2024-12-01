@@ -34,11 +34,11 @@
     <link rel="stylesheet" href="style.css">
     <style>
         @media (max-width: 767px) {
-          .mk {
-            font-size: 20px !important;
-          }
+            .mk {
+                font-size: 20px !important;
+            }
         }
-      </style>
+    </style>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -79,7 +79,7 @@
             <div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
                 <div class="d-inline-flex align-items-center" style="height: 45px;">
                     <small class="me-3 text-light"><i class="fa fa-map-marker-alt me-2"></i>Mahape MIDC, Mahape Circle, Mahape, Navi Mumbai - 400710</small>
-                    <small class="me-3 text-light"><i class="fa fa-phone-alt me-2"></i>8108102341</small>
+                    <small class="me-3 text-light"><i class="fa fa-phone-alt me-2"></i>9167634280</small>
                     <small class="text-light"><i class="fa fa-envelope-open me-2"></i>care@igzinet.in</small>
                 </div>
             </div>
@@ -135,7 +135,7 @@
 
 
                             </h5>
-                            <h1 class="display-1 text-white mb-md-4 animated zoomIn mk"">Seamless speed and dependable connectivity for all your internet needs.</h1>
+                            <h1 class="display-1 text-white mb-md-4 animated zoomIn mk">Seamless speed and dependable connectivity for all your internet needs.</h1>
                             <a href="contact.html" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Contact Us</a>
                             <a href="services.html" class="btn btn-outline-light py-md-3 px-md-5 animated slideInRight">Our Services</a>
                         </div>
@@ -265,7 +265,7 @@
                         </div>
                         <div class="ps-4">
                             <h5 class="mb-2">Need Assistance?</h5>
-                            <h4 class="text-primary mb-0">+1 800 123 4567</h4>
+                            <h4 class="text-primary mb-0">+91 9167634280</h4>
                         </div>
                     </div>
                     <a href="contact.html" class="btn btn-primary py-3 px-5 mt-3 wow zoomIn"
@@ -419,7 +419,7 @@
                         <p class="text-white mb-3">Question about plan, pricing or availability?
                             Just have your people call our people. 
                             </p>
-                        <h2 class="text-white mb-0">+91 81081 02341</h2>
+                        <h2 class="text-white mb-0">+91 9167634280</h2>
                     </div>
                 </div>
             </div>
@@ -466,7 +466,7 @@
                         </div>
                         <div class="ps-4">
                             <h5 class="mb-2">Call Us Now</h5>
-                            <h4 class="text-primary mb-0">+91 8108102341</h4>
+                            <h4 class="text-primary mb-0">+91 9167634280</h4>
                         </div>
                     </div>
                 </div>
@@ -655,7 +655,7 @@
                             </div>
                             <div class="d-flex mb-2">
                                 <i class="bi bi-telephone text-primary me-2"></i>
-                                <p class="mb-0">8108102341</p>
+                                <p class="mb-0">9167634280</p>
                             </div>
                             <div class="d-flex mt-4">
                                 <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-twitter fw-normal"></i></a>
@@ -693,7 +693,7 @@
                 </div>
             </div>
         </div>
-    
+
         <div class="container-fluid text-white" style="background: #061429;">
             <div class="container text-center">
                 <div class="row justify-content-end">
@@ -707,12 +707,12 @@
             </div>
         </div>
         <!-- Footer End -->
-    
-    
+
+
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded back-to-top"><i class="bi bi-arrow-up"></i></a>
-    
-    
+
+
         <!-- JavaScript Libraries -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -721,63 +721,73 @@
         <script src="lib/waypoints/waypoints.min.js"></script>
         <script src="lib/counterup/counterup.min.js"></script>
         <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    
+
         <!-- Template Javascript -->
         <script src="js/main.js"></script>
-    
+
         <!-- Custom Script to Load Packages -->
         <script>
             // Reference to the packages in Firebase Database
             const packagesRef = firebase.database().ref('packages');
-    
+
             // Function to load packages
             function loadPackages() {
-        packagesRef.on('value', (snapshot) => {
-            const packagesContainer = document.getElementById('packages-container');
-            packagesContainer.innerHTML = ''; // Clear existing packages
-            snapshot.forEach((childSnapshot) => {
-                const packageData = childSnapshot.val();
-                const packageKey = childSnapshot.key;
+                packagesRef.on('value', (snapshot) => {
+                    const packagesContainer = document.getElementById('packages-container');
+                    packagesContainer.innerHTML = ''; // Clear existing packages
+                    snapshot.forEach((childSnapshot) => {
+                        const packageData = childSnapshot.val();
+                        const packageKey = childSnapshot.key;
 
-                // Create package card
-                const packageCard = document.createElement('div');
-                packageCard.className = 'col-md-4 mb-4';
+                        // Create package card
+                        const packageCard = document.createElement('div');
+                        packageCard.className = 'col-md-4 mb-4';
 
-                // Generate durations list
-                let durationsList = '';
-                for (const [days, price] of Object.entries(packageData.durations)) {
-                    durationsList += `<p class="mb-1"><i class="bi bi-clock-fill me-2 text-primary"></i><strong>${days} Days</strong>: Rs ${price}</p>`;
-                }
+                        // Generate durations list
+                        let durationsList = '';
+                        for (const [days, price] of Object.entries(packageData.durations)) {
+                            durationsList += `<p class="mb-1"><i class="bi bi-clock-fill me-2 text-primary"></i><strong>${days} Days</strong>: Rs ${price}</p>`;
+                        }
 
-                packageCard.innerHTML = `
-                    <div class="pricing-card shadow h-100">
-                        <div class="pricing-header text-center position-relative p-4">
-                            <div class="bg-primary text-white rounded-circle position-absolute top-0 start-50 translate-middle"
-                                style="width: 80px; height: 80px; line-height: 80px;">
-                                <i class="fa fa-wifi fa-2x"></i>
+                        // Construct WhatsApp message
+                        let message = `Hello IGZINET, I am interested in the ${packageData.speed} Mbps plan.`;
+                        message += `\nInstallation Charge: Rs ${packageData.installationCharge}`;
+                        message += `\nGPON Box Charge: Rs ${packageData.gponCharge}`;
+                        for (const [days, price] of Object.entries(packageData.durations)) {
+                            message += `\n${days} Days: Rs ${price}`;
+                        }
+                        const encodedMessage = encodeURIComponent(message);
+                        const whatsappNumber = '9167634280';
+                        const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+                        packageCard.innerHTML = `
+                            <div class="pricing-card shadow h-100">
+                                <div class="pricing-header text-center position-relative p-4">
+                                    <div class="bg-primary text-white rounded-circle position-absolute top-0 start-50 translate-middle"
+                                        style="width: 80px; height: 80px; line-height: 80px;">
+                                        <i class="fa fa-wifi fa-2x"></i>
+                                    </div>
+                                    <h4 class="mt-5 pt-3">${packageData.speed} Mbps</h4>
+                                    <p class="text-muted">Unlimited Data</p>
+                                    <hr>
+                                </div>
+                                <div class="pricing-body p-4">
+                                    ${durationsList}
+                                    <p class="mt-3"><i class="bi bi-tools me-2 text-primary"></i>Installation Charge: <strong>Rs ${packageData.installationCharge}</strong></p>
+                                    <p><i class="bi bi-box-seam me-2 text-primary"></i>GPON Box Charge: <strong>Rs ${packageData.gponCharge}</strong></p>
+                                </div>
+                                <div class="pricing-footer text-center p-4">
+                                    <a href="${whatsappLink}" target="_blank" class="btn btn-primary w-100 py-2">Choose Plan</a>
+                                </div>
                             </div>
-                            <h4 class="mt-5 pt-3">${packageData.speed} Mbps</h4>
-                            <p class="text-muted">Unlimited Data</p>
-                            <hr>
-                        </div>
-                        <div class="pricing-body p-4">
-                            ${durationsList}
-                            <p class="mt-3"><i class="bi bi-tools me-2 text-primary"></i>Installation Charge: <strong>Rs ${packageData.installationCharge}</strong></p>
-                            <p><i class="bi bi-box-seam me-2 text-primary"></i>GPON Box Charge: <strong>Rs ${packageData.gponCharge}</strong></p>
-                        </div>
-                        <div class="pricing-footer text-center p-4">
-                            <a href="#" class="btn btn-primary w-100 py-2">Choose Plan</a>
-                        </div>
-                    </div>
-                `;
+                        `;
 
-                packagesContainer.appendChild(packageCard);
-            });
-        });
-    }
+                        packagesContainer.appendChild(packageCard);
+                    });
+                });
+            }
 
-    // Load packages on page load
-    document.addEventListener('DOMContentLoaded', loadPackages);
+            // Load packages on page load
             document.addEventListener('DOMContentLoaded', loadPackages);
         </script>
     </body>
